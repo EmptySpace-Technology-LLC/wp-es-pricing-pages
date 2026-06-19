@@ -369,3 +369,27 @@
 @media (max-width: 500px) {
   .es-cards { grid-template-columns: 1fr; }
 }
+
+/* ---- MAGNIFIC POPUP sizing (scoped to our CTA only) ---- */
+.es-pricing-popup.mfp-bg { opacity: .7; }
+
+.es-pricing-popup .mfp-iframe-holder .mfp-content {
+  max-width: 90%;
+  width: 90%;
+}
+
+/* Override the default padding-bottom aspect-ratio trick with a fixed vh height */
+.es-pricing-popup .mfp-iframe-scaler {
+  padding-top: 0 !important;
+  height: 85vh;
+}
+
+.es-pricing-popup .mfp-iframe-scaler iframe {
+  height: 100%;
+  position: static;
+}
+
+.es-pricing-popup .mfp-close {
+  top: -36px;
+  right: -6px;
+}

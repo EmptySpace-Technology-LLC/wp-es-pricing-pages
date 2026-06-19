@@ -132,12 +132,17 @@
       });
     }
 
-    /* modal — auto-detects Magnific Popup or FancyBox */
+    /* modal — library chosen in WP Admin → ES Pricing settings */
+    var modalLib = (data.modalLibrary === 'fancybox') ? 'fancybox' : 'magnific';
+
     if (typeof jQuery !== 'undefined') {
       jQuery(function ($) {
-        if ($.fn.magnificPopup) {
+        if (modalLib === 'fancybox' && $.fn.fancybox) {
+          $('.fancybox-signup').fancybox({ type: 'iframe', width: '90%', height: '85%' });
+        } else if ($.fn.magnificPopup) {
           $('.fancybox-signup').magnificPopup({
             type: 'iframe',
+            mainClass: 'es-pricing-popup',   /* scoped CSS for 90% × 85vh sizing */
             iframe: {
               markup: '<div class="mfp-iframe-scaler">' +
                         '<div class="mfp-close"></div>' +
@@ -145,8 +150,6 @@
                       '</div>'
             }
           });
-        } else if ($.fn.fancybox) {
-          $('.fancybox-signup').fancybox({ type: 'iframe', width: 920, height: 680 });
         }
       });
     }

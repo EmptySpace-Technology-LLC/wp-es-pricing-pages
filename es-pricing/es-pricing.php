@@ -3,7 +3,7 @@
  * Plugin Name:       ES Pricing Tables
  * Plugin URI:        https://www.theemptyspace.com
  * Description:       Interactive pricing table with monthly/annual toggle and discount selector. Add to any page with [es_pricing]. Configure plans and content in Settings → ES Pricing.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 5.8
  * Tested up to:      6.7
  * Author:            EmptySpace Technology
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESP_VERSION', '1.0.1' );
+define( 'ESP_VERSION', '1.0.2' );
 define( 'ESP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ESP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'ESP_OPTION',  'es_pricing_v1' );
@@ -113,6 +113,7 @@ function esp_defaults() {
 		'cta_text'             => 'Sign Up Now',
 		'cta_note'             => 'Free plan available — no credit card required. Paid plans include a 30-day free trial.',
 		'annual_savings_label' => 'Save 10%',
+		'modal_library'        => 'magnific',
 	];
 }
 
@@ -122,7 +123,7 @@ function esp_get_settings() {
 		return esp_defaults();
 	}
 	$defaults = esp_defaults();
-	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label' ] as $key ) {
+	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library' ] as $key ) {
 		if ( empty( $saved[ $key ] ) ) {
 			$saved[ $key ] = $defaults[ $key ];
 		}
@@ -182,7 +183,9 @@ function esp_shortcode( $atts ) {
 	}
 
 	wp_localize_script( 'es-pricing', 'esPricingData', [
-		'plans' => $plans_js,
+		'plans'        => $plans_js,
+		'modalLibrary' => in_array( $s['modal_library'], [ 'magnific', 'fancybox' ], true )
+		                    ? $s['modal_library'] : 'magnific',
 	] );
 
 	$cta_url  = esc_url( $s['cta_url'] );
@@ -290,6 +293,8 @@ function esp_sanitize_settings( $raw ) {
 	$out['cta_text']             = sanitize_text_field( $raw['cta_text']             ?? $defaults['cta_text'] );
 	$out['cta_note']             = sanitize_text_field( $raw['cta_note']             ?? $defaults['cta_note'] );
 	$out['annual_savings_label'] = sanitize_text_field( $raw['annual_savings_label'] ?? $defaults['annual_savings_label'] );
+	$out['modal_library']        = in_array( $raw['modal_library'] ?? '', [ 'magnific', 'fancybox' ], true )
+	                                 ? $raw['modal_library'] : 'magnific';
 
 	return $out;
 }
@@ -508,6 +513,25 @@ function esp_admin_page() {
 						       name="esp[annual_savings_label]"
 						       value="<?php echo esc_attr( $s['annual_savings_label'] ); ?>">
 						<p class="description">e.g. "Save 10%" — shown as a chip on the Annual billing button.</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Modal Library</th>
+					<td>
+						<fieldset>
+							<label style="display:block;margin-bottom:6px">
+								<input type="radio" name="esp[modal_library]" value="magnific"
+								       <?php checked( $s['modal_library'], 'magnific' ); ?>>
+								<strong>Magnific Popup</strong>
+								<span class="description" style="margin-left:6px">— built into the Agile theme; recommended</span>
+							</label>
+							<label style="display:block">
+								<input type="radio" name="esp[modal_library]" value="fancybox"
+								       <?php checked( $s['modal_library'], 'fancybox' ); ?>>
+								<strong>FancyBox</strong>
+								<span class="description" style="margin-left:6px">— loaded by the Easy FancyBox plugin</span>
+							</label>
+						</fieldset>
 					</td>
 				</tr>
 			</table>
