@@ -119,6 +119,7 @@
 .es-card {
   background: #f5f5f5;
   border-radius: 6px;
+  border: 1px solid #e0e0e0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -267,6 +268,22 @@
 .es-card-free .es-card-header  { background: #555; border-bottom-color: #888; }
 .es-card-free .es-amount       { font-size: 30px; color: #888; }
 .es-card-free .es-period       { color: #bbb; }
+
+/* ---- HIGHLIGHT ---- */
+.es-card-highlight {
+  border: 2px solid var(--esp-accent);
+}
+
+.es-card-highlight .es-card-header {
+  background: var(--esp-accent);
+  border-bottom-color: rgba(0,0,0,.15);
+}
+
+/* ---- LOWLIGHT ---- */
+.es-card-lowlight .es-card-header {
+  background: #555;
+  border-bottom-color: #888;
+}
 
 .es-card-enterprise {
   grid-column: 1 / -1;

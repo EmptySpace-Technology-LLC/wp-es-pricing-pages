@@ -2,10 +2,12 @@
 (function () {
   'use strict';
 
-  var data     = window.esPricingData || {};
-  var plans    = data.plans    || [];
-  var period   = 'monthly';
-  var discount = 0;
+  var data          = window.esPricingData || {};
+  var plans         = data.plans         || [];
+  var highlightIdx  = parseInt( data.highlightPlan, 10 );
+  var lowlightIdx   = parseInt( data.lowlightPlan,  10 );
+  var period        = 'monthly';
+  var discount      = 0;
 
   /* ---- helpers ---- */
 
@@ -67,10 +69,12 @@
     if (!container) return;
     container.innerHTML = '';
 
-    plans.forEach(function (plan) {
+    plans.forEach(function (plan, i) {
       var classes = 'es-card';
-      if (plan.isFree)       classes += ' es-card-free';
-      if (plan.isEnterprise) classes += ' es-card-enterprise';
+      if (plan.isFree)          classes += ' es-card-free';
+      if (plan.isEnterprise)    classes += ' es-card-enterprise';
+      if (i === highlightIdx)   classes += ' es-card-highlight';
+      else if (i === lowlightIdx) classes += ' es-card-lowlight';
 
       var features = '<li><strong>' + escHtml(plan.limit) + '</strong></li>' +
         plan.features.map(function (f) {

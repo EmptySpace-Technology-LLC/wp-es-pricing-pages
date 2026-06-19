@@ -3,7 +3,7 @@
  * Plugin Name:       ES Pricing Tables
  * Plugin URI:        https://www.theemptyspace.com
  * Description:       Interactive pricing table with monthly/annual toggle and discount selector. Add to any page with [es_pricing]. Configure plans and content in Settings → ES Pricing.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 5.8
  * Tested up to:      6.7
  * Author:            EmptySpace Technology
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESP_VERSION', '1.1.0' );
+define( 'ESP_VERSION', '1.2.0' );
 define( 'ESP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ESP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'ESP_OPTION',  'es_pricing_v1' );
@@ -115,6 +115,8 @@ function esp_defaults() {
 		'annual_savings_label' => 'Save 10%',
 		'modal_library'        => 'magnific',
 		'accent_color'         => '#FE5000',
+		'highlight_plan'       => '-1',
+		'lowlight_plan'        => '-1',
 	];
 }
 
@@ -136,7 +138,7 @@ function esp_get_settings() {
 		return esp_defaults();
 	}
 	$defaults = esp_defaults();
-	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library', 'accent_color' ] as $key ) {
+	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library', 'accent_color', 'highlight_plan', 'lowlight_plan' ] as $key ) {
 		if ( empty( $saved[ $key ] ) ) {
 			$saved[ $key ] = $defaults[ $key ];
 		}
@@ -196,9 +198,11 @@ function esp_shortcode( $atts ) {
 	}
 
 	wp_localize_script( 'es-pricing', 'esPricingData', [
-		'plans'        => $plans_js,
-		'modalLibrary' => in_array( $s['modal_library'], [ 'magnific', 'fancybox' ], true )
-		                    ? $s['modal_library'] : 'magnific',
+		'plans'          => $plans_js,
+		'modalLibrary'   => in_array( $s['modal_library'], [ 'magnific', 'fancybox' ], true )
+		                      ? $s['modal_library'] : 'magnific',
+		'highlightPlan'  => intval( $s['highlight_plan'] ),
+		'lowlightPlan'   => intval( $s['lowlight_plan'] ),
 	] );
 
 	$cta_url  = esc_url( $s['cta_url'] );
@@ -318,6 +322,11 @@ function esp_sanitize_settings( $raw ) {
 	$out['modal_library']        = in_array( $raw['modal_library'] ?? '', [ 'magnific', 'fancybox' ], true )
 	                                 ? $raw['modal_library'] : 'magnific';
 	$out['accent_color']         = sanitize_hex_color( $raw['accent_color'] ?? '' ) ?: '#FE5000';
+	$plan_count = count( $defaults['plans'] );
+	$out['highlight_plan'] = ( isset( $raw['highlight_plan'] ) && $raw['highlight_plan'] >= 0 && $raw['highlight_plan'] < $plan_count )
+	                           ? strval( intval( $raw['highlight_plan'] ) ) : '-1';
+	$out['lowlight_plan']  = ( isset( $raw['lowlight_plan'] )  && $raw['lowlight_plan']  >= 0 && $raw['lowlight_plan']  < $plan_count )
+	                           ? strval( intval( $raw['lowlight_plan'] ) )  : '-1';
 
 	return $out;
 }
@@ -461,6 +470,41 @@ function esp_admin_page() {
 				</div>
 			</details>
 			<?php endforeach; ?>
+
+			<!-- ── HIGHLIGHT / LOWLIGHT ── -->
+			<h2 class="essp-section-title">Highlight &amp; Lowlight</h2>
+			<p class="description" style="margin-bottom:12px">
+				<strong>Highlight</strong> draws attention to one plan — accent-colored header and heavier border.<br>
+				<strong>Lowlight</strong> visually recedes one plan — grey header, same as the Free card.
+			</p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="esp-highlight-plan">Highlight Plan</label></th>
+					<td>
+						<select id="esp-highlight-plan" name="esp[highlight_plan]">
+							<option value="-1" <?php selected( $s['highlight_plan'], '-1' ); ?>>— None —</option>
+							<?php foreach ( $s['plans'] as $i => $plan ) : ?>
+							<option value="<?php echo $i; ?>" <?php selected( $s['highlight_plan'], strval( $i ) ); ?>>
+								<?php echo esc_html( $plan['name'] ); ?>
+							</option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="esp-lowlight-plan">Lowlight Plan</label></th>
+					<td>
+						<select id="esp-lowlight-plan" name="esp[lowlight_plan]">
+							<option value="-1" <?php selected( $s['lowlight_plan'], '-1' ); ?>>— None —</option>
+							<?php foreach ( $s['plans'] as $i => $plan ) : ?>
+							<option value="<?php echo $i; ?>" <?php selected( $s['lowlight_plan'], strval( $i ) ); ?>>
+								<?php echo esc_html( $plan['name'] ); ?>
+							</option>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+			</table>
 
 			<!-- ── DISCOUNTS ── -->
 			<h2 class="essp-section-title">Discount Options ("I'm a…" dropdown)</h2>
