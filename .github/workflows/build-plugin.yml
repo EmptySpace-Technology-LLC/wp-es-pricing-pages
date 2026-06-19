@@ -1,0 +1,53 @@
+name: Build & Package Plugin
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'          # Triggers on version tags like v1.0.0, v2.1.3
+  workflow_dispatch:      # Also allows manual runs from the GitHub Actions UI
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    name: Build es-pricing
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Package the plugin into a zip.
+      #    The archive contains es-pricing/ as its top-level folder
+      #    so WordPress installs and updates it correctly.
+      - name: Create plugin zip
+        run: |
+          PLUGIN_SLUG="es-pricing"
+          ZIP_NAME="${PLUGIN_SLUG}.zip"
+
+          zip -r "${ZIP_NAME}" "${PLUGIN_SLUG}" \
+            --exclude "${PLUGIN_SLUG}/.git*" \
+            --exclude "${PLUGIN_SLUG}/.github/*" \
+            --exclude "${PLUGIN_SLUG}/*.zip" \
+            --exclude "${PLUGIN_SLUG}/.DS_Store" \
+            --exclude "${PLUGIN_SLUG}/*.log"
+
+          echo "ZIP_NAME=${ZIP_NAME}" >> $GITHUB_ENV
+
+      # 3. Upload zip as a build artifact (always available in Actions UI)
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP_NAME }}
+          path: ${{ env.ZIP_NAME }}
+          retention-days: 30
+
+      # 4. On tagged releases, attach the zip to a GitHub Release
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_NAME }}
+          generate_release_notes: true   # Auto-generates changelog from commits

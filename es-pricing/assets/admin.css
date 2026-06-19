@@ -1,0 +1,129 @@
+/* ES Pricing Admin Page */
+
+.essp-admin .essp-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+  margin: 32px 0 12px;
+}
+
+.essp-plan-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+
+.essp-plan-summary {
+  padding: 13px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.essp-plan-summary::-webkit-details-marker { display: none; }
+
+.essp-plan-summary::before {
+  content: '\25B6';
+  font-size: 9px;
+  color: #888;
+  transition: transform 0.18s;
+  flex-shrink: 0;
+}
+
+details[open] .essp-plan-summary {
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 4px 4px 0 0;
+}
+
+details[open] .essp-plan-summary::before {
+  transform: rotate(90deg);
+}
+
+.essp-plan-label {
+  flex: 1;
+}
+
+.essp-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: #ebebeb;
+  color: #555;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+
+.essp-badge-dark {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+.essp-badge-free {
+  background: #e7f5e9;
+  color: #2e7d32;
+}
+
+.essp-plan-body {
+  padding: 4px 18px 18px;
+}
+
+.essp-plan-body .form-table {
+  margin: 0;
+}
+
+.essp-plan-body .form-table th {
+  padding-left: 0;
+  width: 180px;
+}
+
+/* discount table */
+.essp-discount-table {
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.essp-discount-table thead th {
+  background: #f4f4f4;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #555;
+  padding: 8px 12px;
+}
+
+.essp-discount-table td {
+  padding: 7px 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.essp-discount-table tr:last-child td {
+  border-bottom: none;
+}
+
+.essp-shortcode-hint {
+  background: #f0f6fc;
+  border-left: 4px solid #0073aa;
+  padding: 10px 16px;
+  margin: 0 0 24px;
+  font-size: 13px;
+}
+
+.essp-shortcode-hint code {
+  font-size: 14px;
+  background: #ddeeff;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
