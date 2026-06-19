@@ -3,7 +3,7 @@
  * Plugin Name:       ES Pricing Tables
  * Plugin URI:        https://www.theemptyspace.com
  * Description:       Interactive pricing table with monthly/annual toggle and discount selector. Add to any page with [es_pricing]. Configure plans and content in Settings → ES Pricing.
- * Version:           1.0.2
+ * Version:           1.1.0
  * Requires at least: 5.8
  * Tested up to:      6.7
  * Author:            EmptySpace Technology
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESP_VERSION', '1.0.2' );
+define( 'ESP_VERSION', '1.1.0' );
 define( 'ESP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ESP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'ESP_OPTION',  'es_pricing_v1' );
@@ -114,6 +114,19 @@ function esp_defaults() {
 		'cta_note'             => 'Free plan available — no credit card required. Paid plans include a 30-day free trial.',
 		'annual_savings_label' => 'Save 10%',
 		'modal_library'        => 'magnific',
+		'accent_color'         => '#FE5000',
+	];
+}
+
+function esp_hex_to_rgb( $hex ) {
+	$hex = ltrim( $hex, '#' );
+	if ( strlen( $hex ) === 3 ) {
+		$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+	}
+	return [
+		hexdec( substr( $hex, 0, 2 ) ),
+		hexdec( substr( $hex, 2, 2 ) ),
+		hexdec( substr( $hex, 4, 2 ) ),
 	];
 }
 
@@ -123,7 +136,7 @@ function esp_get_settings() {
 		return esp_defaults();
 	}
 	$defaults = esp_defaults();
-	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library' ] as $key ) {
+	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library', 'accent_color' ] as $key ) {
 		if ( empty( $saved[ $key ] ) ) {
 			$saved[ $key ] = $defaults[ $key ];
 		}
@@ -193,8 +206,12 @@ function esp_shortcode( $atts ) {
 	$cta_note = esc_html( $s['cta_note'] );
 	$save_lbl = esc_html( $s['annual_savings_label'] );
 
+	$accent     = sanitize_hex_color( $s['accent_color'] ) ?: '#FE5000';
+	$accent_rgb = esp_hex_to_rgb( $accent );
+
 	ob_start();
 	?>
+	<style>#es-pricing{--esp-accent:<?php echo esc_attr( $accent ); ?>;--esp-accent-rgb:<?php echo esc_attr( implode( ',', $accent_rgb ) ); ?>;}</style>
 	<div class="es-pricing" id="es-pricing">
 
 		<div class="es-controls">
@@ -256,7 +273,12 @@ add_action( 'admin_menu', function () {
 
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== 'settings_page_es-pricing' ) return;
-	wp_enqueue_style( 'esp-admin', ESP_URL . 'assets/admin.css', [], ESP_VERSION );
+	wp_enqueue_style( 'wp-color-picker' );
+	wp_enqueue_style( 'esp-admin', ESP_URL . 'assets/admin.css', [ 'wp-color-picker' ], ESP_VERSION );
+	wp_enqueue_script( 'wp-color-picker' );
+	wp_add_inline_script( 'wp-color-picker',
+		'jQuery(function($){ $(".esp-color-picker").wpColorPicker(); });'
+	);
 } );
 
 function esp_sanitize_settings( $raw ) {
@@ -295,6 +317,7 @@ function esp_sanitize_settings( $raw ) {
 	$out['annual_savings_label'] = sanitize_text_field( $raw['annual_savings_label'] ?? $defaults['annual_savings_label'] );
 	$out['modal_library']        = in_array( $raw['modal_library'] ?? '', [ 'magnific', 'fancybox' ], true )
 	                                 ? $raw['modal_library'] : 'magnific';
+	$out['accent_color']         = sanitize_hex_color( $raw['accent_color'] ?? '' ) ?: '#FE5000';
 
 	return $out;
 }
@@ -513,6 +536,16 @@ function esp_admin_page() {
 						       name="esp[annual_savings_label]"
 						       value="<?php echo esc_attr( $s['annual_savings_label'] ); ?>">
 						<p class="description">e.g. "Save 10%" — shown as a chip on the Annual billing button.</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="esp-accent-color">Accent Color</label></th>
+					<td>
+						<input type="text" id="esp-accent-color" class="esp-color-picker"
+						       name="esp[accent_color]"
+						       value="<?php echo esc_attr( $s['accent_color'] ); ?>"
+						       data-default-color="#FE5000">
+						<p class="description">Applied to buttons, card borders, checkmarks, and highlights. Default: <code>#FE5000</code> (StageStock orange).</p>
 					</td>
 				</tr>
 				<tr>
