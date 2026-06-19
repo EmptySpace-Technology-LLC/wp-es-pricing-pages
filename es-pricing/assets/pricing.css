@@ -270,17 +270,18 @@
 .es-card-free .es-period       { color: #bbb; }
 
 /* ---- HIGHLIGHT ---- */
-.es-card-highlight {
+/* Specificity (0,3,0) beats .es-card-free/.es-card-enterprise (0,2,0) */
+.es-card.es-card-highlight {
   border: 2px solid var(--esp-accent);
 }
 
-.es-card-highlight .es-card-header {
+.es-card.es-card-highlight .es-card-header {
   background: var(--esp-accent);
   border-bottom-color: rgba(0,0,0,.15);
 }
 
 /* ---- LOWLIGHT ---- */
-.es-card-lowlight .es-card-header {
+.es-card.es-card-lowlight .es-card-header {
   background: #555;
   border-bottom-color: #888;
 }
