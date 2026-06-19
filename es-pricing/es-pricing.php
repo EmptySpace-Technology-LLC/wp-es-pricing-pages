@@ -3,7 +3,7 @@
  * Plugin Name:       ES Pricing Tables
  * Plugin URI:        https://www.theemptyspace.com
  * Description:       Interactive pricing table with monthly/annual toggle and discount selector. Add to any page with [es_pricing]. Configure plans and content in Settings → ES Pricing.
- * Version:           1.2.1
+ * Version:           1.2.2
  * Requires at least: 5.8
  * Tested up to:      6.7
  * Author:            EmptySpace Technology
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESP_VERSION', '1.2.1' );
+define( 'ESP_VERSION', '1.2.2' );
 define( 'ESP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'ESP_URL',     plugin_dir_url( __FILE__ ) );
 define( 'ESP_OPTION',  'es_pricing_v1' );
@@ -139,7 +139,7 @@ function esp_get_settings() {
 	}
 	$defaults = esp_defaults();
 	foreach ( [ 'cta_url', 'cta_text', 'cta_note', 'annual_savings_label', 'modal_library', 'accent_color', 'highlight_plan', 'lowlight_plan' ] as $key ) {
-		if ( empty( $saved[ $key ] ) ) {
+		if ( ! isset( $saved[ $key ] ) ) {
 			$saved[ $key ] = $defaults[ $key ];
 		}
 	}
